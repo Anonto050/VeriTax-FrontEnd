@@ -15,11 +15,19 @@ jobs:
       # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          node-version: '20'  # Ensures Node.js v20 is used
 
       # Step 2: Read the version from version.txt
       - name: Read version number
         id: read_version
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        run: |
+          if [ ! -f version.txt ]; then
+            echo "Error: version.txt not found"
+            exit 1
+          fi
+          VERSION=$(cat version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       # Step 3: Send the new version to deps2.dev
       - name: Notify deps2.dev of new version
