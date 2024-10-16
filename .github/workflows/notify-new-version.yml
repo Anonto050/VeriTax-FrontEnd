@@ -1,0 +1,32 @@
+name: Notify deps2.dev of New Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - version.txt  # Only trigger when version.txt is changed
+
+jobs:
+  notify-deps2-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Read the version from version.txt
+      - name: Read version number
+        id: read_version
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
+      # Step 3: Send the new version to deps2.dev
+      - name: Notify deps2.dev of new version
+        run: |
+          curl -X POST https://deps2.dev/newVersion \
+            -H "Content-Type: application/json" \
+            -d '{
+              "packageName": "VeriTax",
+              "version": "'"$VERSION"'"
+            }'
